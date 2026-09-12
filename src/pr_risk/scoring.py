@@ -124,34 +124,16 @@ def score_file(
             file_stats.historical_bugfix_count
         ),
     )
-
-
-def score_pr(files: list[FileStats]) -> PRRiskResult:
-    """
-    Calculate the overall PR risk score.
-
-    Each file contributes proportionally to how much
-    of the PR it represents.
-
-    Example:
-
-        payment.py = 80 lines changed
-        README.md   = 20 lines changed
-
-    payment.py contributes 80% of the PR score.
-    """
-
+def score_pr(
+    files: list[FileStats],
+    churn_distribution: list[int],
+) -> PRRiskResult:
     if not files:
         return PRRiskResult(
             risk_score=0.0,
             risk_level="low",
             contributing_files=[],
         )
-
-    churn_distribution = [
-        file.historical_commit_count
-        for file in files
-    ]
 
     file_results = [
         score_file(
@@ -168,7 +150,6 @@ def score_pr(files: list[FileStats]) -> PRRiskResult:
 
     if total_lines_changed == 0:
         overall_score = 0.0
-
     else:
         overall_score = 0.0
 
@@ -193,3 +174,4 @@ def score_pr(files: list[FileStats]) -> PRRiskResult:
         risk_level=get_risk_level(overall_score),
         contributing_files=file_results,
     )
+
