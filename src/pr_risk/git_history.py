@@ -219,6 +219,29 @@ def score_pr(
         contributing_files=file_results,
     )
 
+def get_tracked_files(
+    repo_path: str | Path = ".",
+    revision: str = "HEAD",
+) -> list[str]:
+    output = run_git_command(
+        [
+            "ls-tree",
+            "-r",
+            "--name-only",
+            revision,
+        ],
+        repo_path=repo_path,
+    )
+
+    if not output:
+        return []
+
+    return [
+        line.strip()
+        for line in output.splitlines()
+        if line.strip()
+    ]
+
 def get_repo_churn_distribution(
     repo_path: str | Path = ".",
     since: str = HISTORY_WINDOW,
