@@ -1,4 +1,4 @@
-  name: PR Risk Signal
+name: PR Risk Signal
 
 on:
   pull_request:
@@ -26,17 +26,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install project
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-
       - name: Analyze pull request
         env:
+          PYTHONPATH: ${{ github.workspace }}/src
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           PR_RISK_API_URL: ${{ vars.PR_RISK_API_URL }}
-
         run: |
-          python scripts/analyze_pr.py 
+          python scripts/analyze_pr.py
