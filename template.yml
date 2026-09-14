@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Description: PR Risk Signal AWS infrastructure
+
+Parameters:
+  DBUsername:
+    Type: String
+    Default: prriskadmin
+    Description: PostgreSQL master username
+
+  DBPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+    Description: PostgreSQL master password
+
+Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 15
+    MemorySize: 256
+
+Resources:
+
+  PRRiskVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: pr-risk-vpc
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref PRRiskVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: pr-risk-private-1
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref PRRiskVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select
+        - 1
+        - !GetAZs ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: pr-risk-private-2
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref PRRiskVPC
+      Tags:
+        - Key: Name
+          Value: pr-risk-private-rt
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for PR Risk Lambda
+      VpcId: !Ref PRRiskVPC
+      Tags:
+        - Key: Name
+          Value: pr-risk-lambda-sg
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PostgreSQL access only from PR Risk Lambda
+      VpcId: !Ref PRRiskVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432  
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref LambdaSecurityGroup
+      Tags:
+        - Key: Name
+          Value: pr-risk-rds-sg
+
+  PRRiskDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Private subnets for PR Risk PostgreSQL
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: pr-risk-db-subnet-group
+
+  PRRiskDatabase:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      DBInstanceIdentifier: pr-risk-postgres
+      Engine: postgres
+      DBInstanceClass: db.t4g.micro
+      DBName: prrisk
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      AllocatedStorage: 20
+      StorageType: gp2
+      MultiAZ: false
+      PubliclyAccessible: false
+      StorageEncrypted: true
+      BackupRetentionPeriod: 0
+      AutoMinorVersionUpgrade: true
+      DeletionProtection: false
+      DBSubnetGroupName: !Ref PRRiskDBSubnetGroup
+      VPCSecurityGroups:
+        - !GetAtt RDSSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: pr-risk-postgres
+
+  PRRiskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: pr-risk-scorer
+      CodeUri: src/
+      Handler: pr_risk.aws_handler.lambda_handler
+
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+
+      Environment:
+        Variables:
+          DB_HOST: !GetAtt PRRiskDatabase.Endpoint.Address
+          DB_PORT: !GetAtt PRRiskDatabase.Endpoint.Port
+          DB_NAME: prrisk
+          DB_USER: !Ref DBUsername
+          DB_PASSWORD: !Ref DBPassword
+
+      Events:
+        ScoreAPI:
+          Type: Api
+          Properties:
+            Path: /score
+            Method: post
+
+Outputs:
+
+  ApiEndpoint:
+    Description: PR Risk API Gateway endpoint
+    Value: !Sub
+      - "https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/Prod/score"
+      - ApiId: !Ref ServerlessRestApi
+
+  DatabaseEndpoint:
+    Description: Private PostgreSQL RDS endpoint
+    Value: !GetAtt PRRiskDatabase.Endpoint.Address
+
+  VPCId:
+    Description: PR Risk VPC ID
+    Value: !Ref PRRiskVPC
