@@ -328,29 +328,67 @@ def write_github_summary(payload: dict) -> None:
             f"| {file_data['bugfix_ratio']} |"
         )
 
-    risky_regions = []
+    lines.append("")
+    lines.append("## Review focus")
+    lines.append("")
+
+    review_regions = []
 
     for file_data in payload.get("files", []):
         for region in file_data.get("regions", []):
-            if region["historical_bugfix_count"] > 0:
-                old_start = region["old_start"]
-                old_count = region["old_count"]
+            old_start = region["old_start"]
+            old_count = region["old_count"]
+            new_start = region["new_start"]
+            new_count = region["new_count"]
 
-                if old_count > 0:
-                    old_end = old_start + old_count - 1
+            if old_count > 0:
+                start_line = old_start
+                end_line = old_start + old_count - 1
+                line_label = f"old lines {start_line}-{end_line}"
+            elif new_count > 0:
+                start_line = new_start
+                end_line = new_start + new_count - 1
+                line_label = f"new lines {start_line}-{end_line}"
+            else:
+                continue
 
-                    risky_regions.append(
-                        f"- `{file_data['path']}` "
-                        f"lines {old_start}-{old_end}: "
-                        f"{region['historical_bugfix_count']} "
-                        f"historical bugfix commit(s)"
-                    )
+            review_regions.append(
+                {
+                    "path": file_data["path"],
+                    "line_label": line_label,
+                    "historical_commit_count": region[
+                        "historical_commit_count"
+                    ],
+                    "historical_bugfix_count": region[
+                        "historical_bugfix_count"
+                    ],
+                    "bugfix_ratio": region["bugfix_ratio"],
+                    "file_risk_score": file_data["risk_score"],
+                }
+            )
 
-    if risky_regions:
-        lines.append("")
-        lines.append("## Review focus")
-        lines.append("")
-        lines.extend(risky_regions)
+    review_regions.sort(
+        key=lambda region: (
+            region["historical_bugfix_count"],
+            region["historical_commit_count"],
+            region["file_risk_score"],
+        ),
+        reverse=True,
+    )
+
+    if review_regions:
+        for region in review_regions:
+            lines.append(
+                f"- `{region['path']}` — {region['line_label']}  \n"
+                f"  history: "
+                f"{region['historical_commit_count']} commits, "
+                f"{region['historical_bugfix_count']} bugfix commits, "
+                f"bugfix ratio {region['bugfix_ratio']:.2f}"
+            )
+    else:
+        lines.append(
+            "No changed regions were available for review focus."
+        )
 
     with open(
         summary_path,
@@ -359,7 +397,7 @@ def write_github_summary(payload: dict) -> None:
     ) as summary_file:
         summary_file.write("\n".join(lines))
         summary_file.write("\n")
-
+        
 def main():
 
     base_sha = os.environ.get("PR_BASE_SHA")
