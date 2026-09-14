@@ -6,6 +6,10 @@ inputs:
     description: "PR Risk Signal API endpoint"
     required: true
 
+  api-key:
+    description: "PR Risk Signal API key"
+    required: true
+
 runs:
   using: "composite"
 
@@ -24,5 +28,7 @@ runs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         PR_RISK_API_URL: ${{ inputs.api-url }}
+        PR_RISK_API_KEY: ${{ inputs.api-key }}
+
       run: |
         python "${{ github.action_path }}/scripts/analyze_pr.py"

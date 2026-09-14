@@ -25,3 +25,4 @@ jobs:
         uses: ./
         with:
           api-url: ${{ vars.PR_RISK_API_URL }}
+          api-key: ${{ secrets.PR_RISK_API_KEY }}
