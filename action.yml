@@ -1,0 +1,28 @@
+name: "PR Risk Signal"
+description: "Analyze pull request risk using Git history and changed-code behavior"
+
+inputs:
+  api-url:
+    description: "PR Risk Signal API endpoint"
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Run PR Risk Signal
+      shell: bash
+      env:
+        PYTHONPATH: ${{ github.action_path }}/src
+        PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_RISK_API_URL: ${{ inputs.api-url }}
+      run: |
+        python "${{ github.action_path }}/scripts/analyze_pr.py"

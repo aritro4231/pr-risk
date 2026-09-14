@@ -21,18 +21,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Run PR Risk Signal
+        uses: ./
         with:
-          python-version: "3.11"
-
-      - name: Analyze pull request
-        env:
-          PYTHONPATH: ${{ github.workspace }}/src
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_RISK_API_URL: ${{ vars.PR_RISK_API_URL }}
-        run: |
-          python scripts/analyze_pr.py
+          api-url: ${{ vars.PR_RISK_API_URL }}
