@@ -288,6 +288,77 @@ def post_to_api(
         print("AWS response:")
         print(body)
 
+def write_github_summary(payload: dict) -> None:
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+
+    if not summary_path:
+        return
+
+    lines = []
+
+    lines.append("# PR Risk Signal")
+    lines.append("")
+    lines.append(
+        f"**Overall risk:** "
+        f"{payload['risk_level'].upper()} — "
+        f"{payload['risk_score']}"
+    )
+    lines.append("")
+
+    lines.append(
+        "| File | Risk | Level | Lines changed | "
+        "Churn percentile | Bugfix ratio |"
+    )
+    lines.append(
+        "|---|---:|---|---:|---:|---:|"
+    )
+
+    for file_data in payload.get("files", []):
+        lines_changed = (
+            file_data["additions"]
+            + file_data["deletions"]
+        )
+
+        lines.append(
+            f"| `{file_data['path']}` "
+            f"| {file_data['risk_score']} "
+            f"| {file_data['risk_level']} "
+            f"| {lines_changed} "
+            f"| {file_data['churn_percentile']} "
+            f"| {file_data['bugfix_ratio']} |"
+        )
+
+    risky_regions = []
+
+    for file_data in payload.get("files", []):
+        for region in file_data.get("regions", []):
+            if region["historical_bugfix_count"] > 0:
+                old_start = region["old_start"]
+                old_count = region["old_count"]
+
+                if old_count > 0:
+                    old_end = old_start + old_count - 1
+
+                    risky_regions.append(
+                        f"- `{file_data['path']}` "
+                        f"lines {old_start}-{old_end}: "
+                        f"{region['historical_bugfix_count']} "
+                        f"historical bugfix commit(s)"
+                    )
+
+    if risky_regions:
+        lines.append("")
+        lines.append("## Review focus")
+        lines.append("")
+        lines.extend(risky_regions)
+
+    with open(
+        summary_path,
+        "a",
+        encoding="utf-8",
+    ) as summary_file:
+        summary_file.write("\n".join(lines))
+        summary_file.write("\n")
 
 def main():
 
@@ -324,6 +395,8 @@ def main():
             indent=2,
         )
     )
+
+    write_github_summary(payload)
 
     api_url = os.environ.get(
         "PR_RISK_API_URL"
