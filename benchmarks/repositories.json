@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "history_start": "2023-07-01T00:00:00Z",
+  "cutoff": "2024-01-01T00:00:00Z",
+  "outcome_end": "2024-07-01T00:00:00Z",
+  "repositories": [
+    {
+      "name": "pallets/flask",
+      "url": "https://github.com/pallets/flask.git",
+      "ref": "refs/tags/3.1.0",
+      "anchor": "ab8149664182b662453a563161aa89013c806dc9",
+      "cutoff_revision": "708d62d7172a30c5b0ace1d212c5a3bc2b53b98c",
+      "outcome_revision": "d718ecf6d3dfc4656d262154c59672437c1ea075"
+    },
+    {
+      "name": "pallets/click",
+      "url": "https://github.com/pallets/click.git",
+      "ref": "refs/tags/8.1.8",
+      "anchor": "934813e4d421071a1b3db3973c02fe2721359a6e",
+      "cutoff_revision": "76cb8410d9b28c3fb55be1bdff5eed14225a7366",
+      "outcome_revision": "ac56c4551fcc5d4a60a66b252d6666bf58248e03"
+    },
+    {
+      "name": "psf/requests",
+      "url": "https://github.com/psf/requests.git",
+      "ref": "refs/tags/v2.32.4",
+      "anchor": "021dc729f0b71a3030cefdbec7fb57a0e80a6cfd",
+      "cutoff_revision": "72eccc8dd8b7c272e520f22b0256386c80864e94",
+      "outcome_revision": "0e322af87745eff34caffe4df68456ebc20d9068"
+    },
+    {
+      "name": "expressjs/express",
+      "url": "https://github.com/expressjs/express.git",
+      "ref": "refs/tags/4.21.2",
+      "anchor": "1faf228935aa0a13111f92c28ee795be64ce3f0f",
+      "cutoff_revision": "a22920707bfd30e083e5b8e076841d226266cb06",
+      "outcome_revision": "4cf7eed927d3ccd3f1d0c9a14d562ec0a1635e86"
+    }
+  ]
+}

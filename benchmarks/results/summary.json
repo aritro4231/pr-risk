@@ -1,0 +1,421 @@
+{
+  "schema_version": 1,
+  "windows": {
+    "history_start": "2023-07-01T00:00:00Z",
+    "cutoff": "2024-01-01T00:00:00Z",
+    "outcome_end": "2024-07-01T00:00:00Z"
+  },
+  "protocol": {
+    "date_field": "committer timestamp, UTC; start inclusive, end exclusive",
+    "cohort": "all tracked paths at cutoff revision",
+    "labels": "at least one non-merge future commit matching production subject regex",
+    "path_identity": "fixed cutoff path; no forward rename tracking",
+    "thresholds": {
+      "low_max": 39,
+      "medium_max": 69
+    },
+    "bugfix_keywords": [
+      "fix",
+      "bug",
+      "hotfix",
+      "revert",
+      "patch"
+    ],
+    "churn_weight": 0.4,
+    "bugfix_weight": 0.6
+  },
+  "provenance": {
+    "python": "3.14.7",
+    "git": "git version 2.55.0.windows.5",
+    "manifest_sha256": "7efde40e6f4bd465a91733cde9b9d8d8b5c9d398e96f40c3cea0032bb0c932a1",
+    "source_sha256": {
+      "src/pr_risk/config.py": "44c61b5558ec713d3d9dd80f386d9cfc5cb4b836f9b92eb597eca9cce4d9cca9",
+      "src/pr_risk/models.py": "86cbfcfdb7eed2c3d84dcc9cfd7310186f7a97363fc27f6a5934b75e0d11431b",
+      "src/pr_risk/scoring.py": "5f38255957341011e0874f212308c600eb662db7d36ae3be9ba5587c7eae8725",
+      "src/pr_risk/git_history.py": "af266d58cd0009def478e5f9530da122374e94e7dcee26b51212839f685578b7",
+      "benchmarks/validate.py": "dce565fc9e39ecac03a5023f0265ba9247539fc6a0162a20b077c2c056c154f1"
+    }
+  },
+  "summary": {
+    "repositories_tested": 4,
+    "total_historical_commits_analyzed": 19521,
+    "total_history_window_commits": 223,
+    "files_scored": 730,
+    "pooled": {
+      "low": {
+        "files": 689,
+        "files_with_future_bugfix": 18,
+        "future_bugfix_file_rate": 0.026124818577648767,
+        "mean_future_bugfix_commits_per_file": 0.03193033381712627
+      },
+      "medium": {
+        "files": 20,
+        "files_with_future_bugfix": 5,
+        "future_bugfix_file_rate": 0.25,
+        "mean_future_bugfix_commits_per_file": 0.35
+      },
+      "high": {
+        "files": 21,
+        "files_with_future_bugfix": 0,
+        "future_bugfix_file_rate": 0.0,
+        "mean_future_bugfix_commits_per_file": 0.0
+      },
+      "high_risk_precision": 0.0
+    },
+    "repository_mean_future_bugfix_file_rate": {
+      "low": 0.02760029629568892,
+      "medium": 0.20625,
+      "high": 0.0
+    },
+    "repositories_with_nonempty_group": {
+      "low": 4,
+      "medium": 4,
+      "high": 3
+    },
+    "repository_mean_high_risk_precision": 0.0,
+    "historically_active_only": {
+      "low": {
+        "files": 109,
+        "files_with_future_bugfix": 10,
+        "future_bugfix_file_rate": 0.09174311926605505,
+        "mean_future_bugfix_commits_per_file": 0.11926605504587157
+      },
+      "medium": {
+        "files": 20,
+        "files_with_future_bugfix": 5,
+        "future_bugfix_file_rate": 0.25,
+        "mean_future_bugfix_commits_per_file": 0.35
+      },
+      "high": {
+        "files": 21,
+        "files_with_future_bugfix": 0,
+        "future_bugfix_file_rate": 0.0,
+        "mean_future_bugfix_commits_per_file": 0.0
+      },
+      "high_risk_precision": 0.0
+    }
+  },
+  "repositories": [
+    {
+      "name": "pallets/flask",
+      "url": "https://github.com/pallets/flask.git",
+      "ref": "refs/tags/3.1.0",
+      "anchor": "ab8149664182b662453a563161aa89013c806dc9",
+      "cutoff_revision": "708d62d7172a30c5b0ace1d212c5a3bc2b53b98c",
+      "outcome_revision": "d718ecf6d3dfc4656d262154c59672437c1ea075",
+      "history_audit": {
+        "reachable_commits": 5214,
+        "max_committer_timestamp": 1702513693
+      },
+      "outcome_audit": {
+        "reachable_commits": 5292,
+        "max_committer_timestamp": 1717787058
+      },
+      "history_window_commits": 102,
+      "files_scored": 250,
+      "groups": {
+        "low": {
+          "files": 239,
+          "files_with_future_bugfix": 5,
+          "future_bugfix_file_rate": 0.02092050209205021,
+          "mean_future_bugfix_commits_per_file": 0.02510460251046025
+        },
+        "medium": {
+          "files": 8,
+          "files_with_future_bugfix": 3,
+          "future_bugfix_file_rate": 0.375,
+          "mean_future_bugfix_commits_per_file": 0.625
+        },
+        "high": {
+          "files": 3,
+          "files_with_future_bugfix": 0,
+          "future_bugfix_file_rate": 0.0,
+          "mean_future_bugfix_commits_per_file": 0.0
+        },
+        "high_risk_precision": 0.0
+      },
+      "outcomes": {
+        "eligible_nonmerge_commits": 45,
+        "excluded_pre_cutoff_nonmerge_commits": 0,
+        "bugfix_like_commits": 8,
+        "labeled_commits": [
+          {
+            "sha": "860a25c390eba8e6c089a818b02800dd9d789864",
+            "subject": "fix mypy finding",
+            "scored_paths": [
+              "src/flask/helpers.py"
+            ]
+          },
+          {
+            "sha": "eb1182a10e757b5e76009c69fdf3a88a5afc6840",
+            "subject": "fix mypy finding",
+            "scored_paths": [
+              "src/flask/sessions.py"
+            ]
+          },
+          {
+            "sha": "a363642a32880114c7944b1017f2f69bd4cc00eb",
+            "subject": "fix mypy finding with new werkzeug endpoint type",
+            "scored_paths": [
+              "src/flask/wrappers.py"
+            ]
+          },
+          {
+            "sha": "ccf125bf30102beedafb3ecef72376bfb6c90a4d",
+            "subject": "fix mypy findings",
+            "scored_paths": [
+              "src/flask/sessions.py"
+            ]
+          },
+          {
+            "sha": "1af8f95785b85d0937153ee63d504c0b51934d80",
+            "subject": "fix super call in list comprehension",
+            "scored_paths": [
+              "CHANGES.rst",
+              "src/flask/cli.py",
+              "tests/test_cli.py"
+            ]
+          },
+          {
+            "sha": "ecc057dd4857e655f0844b781899a917852042a4",
+            "subject": "fix jinja_loader annotation",
+            "scored_paths": [
+              "CHANGES.rst",
+              "src/flask/sansio/scaffold.py"
+            ]
+          },
+          {
+            "sha": "5fcc999b7df0f5cc71cfd9b74ea494b96486f84f",
+            "subject": "fix create release action",
+            "scored_paths": [
+              ".github/workflows/publish.yaml"
+            ]
+          },
+          {
+            "sha": "da3a0ddfe2de5be718a2d7cb3021f350bf04c402",
+            "subject": "fix slsa generator version",
+            "scored_paths": [
+              ".github/workflows/publish.yaml"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "pallets/click",
+      "url": "https://github.com/pallets/click.git",
+      "ref": "refs/tags/8.1.8",
+      "anchor": "934813e4d421071a1b3db3973c02fe2721359a6e",
+      "cutoff_revision": "76cb8410d9b28c3fb55be1bdff5eed14225a7366",
+      "outcome_revision": "ac56c4551fcc5d4a60a66b252d6666bf58248e03",
+      "history_audit": {
+        "reachable_commits": 2294,
+        "max_committer_timestamp": 1701728834
+      },
+      "outcome_audit": {
+        "reachable_commits": 2321,
+        "max_committer_timestamp": 1716414473
+      },
+      "history_window_commits": 45,
+      "files_scored": 146,
+      "groups": {
+        "low": {
+          "files": 128,
+          "files_with_future_bugfix": 4,
+          "future_bugfix_file_rate": 0.03125,
+          "mean_future_bugfix_commits_per_file": 0.03125
+        },
+        "medium": {
+          "files": 4,
+          "files_with_future_bugfix": 1,
+          "future_bugfix_file_rate": 0.25,
+          "mean_future_bugfix_commits_per_file": 0.25
+        },
+        "high": {
+          "files": 14,
+          "files_with_future_bugfix": 0,
+          "future_bugfix_file_rate": 0.0,
+          "mean_future_bugfix_commits_per_file": 0.0
+        },
+        "high_risk_precision": 0.0
+      },
+      "outcomes": {
+        "eligible_nonmerge_commits": 17,
+        "excluded_pre_cutoff_nonmerge_commits": 0,
+        "bugfix_like_commits": 3,
+        "labeled_commits": [
+          {
+            "sha": "a2ce3947e1b6fa7ff1dce796b9be466f54116f35",
+            "subject": "Fix extlinks in conf.py",
+            "scored_paths": [
+              "docs/conf.py"
+            ]
+          },
+          {
+            "sha": "e660d446d30d5714b6fd5e5b5cebac19db875a46",
+            "subject": "Fix broken code example in docs under Advanced Patterns",
+            "scored_paths": [
+              "docs/advanced.rst"
+            ]
+          },
+          {
+            "sha": "61f8101f4e0d02cb902ef17853fa35ad88185265",
+            "subject": "Fix printing of default option value to handle empty strings",
+            "scored_paths": [
+              "CHANGES.rst",
+              "src/click/core.py",
+              "tests/test_options.py"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "psf/requests",
+      "url": "https://github.com/psf/requests.git",
+      "ref": "refs/tags/v2.32.4",
+      "anchor": "021dc729f0b71a3030cefdbec7fb57a0e80a6cfd",
+      "cutoff_revision": "72eccc8dd8b7c272e520f22b0256386c80864e94",
+      "outcome_revision": "0e322af87745eff34caffe4df68456ebc20d9068",
+      "history_audit": {
+        "reachable_commits": 6230,
+        "max_committer_timestamp": 1703356428
+      },
+      "outcome_audit": {
+        "reachable_commits": 6294,
+        "max_committer_timestamp": 1716996970
+      },
+      "history_window_commits": 72,
+      "files_scored": 103,
+      "groups": {
+        "low": {
+          "files": 94,
+          "files_with_future_bugfix": 3,
+          "future_bugfix_file_rate": 0.031914893617021274,
+          "mean_future_bugfix_commits_per_file": 0.05319148936170213
+        },
+        "medium": {
+          "files": 5,
+          "files_with_future_bugfix": 1,
+          "future_bugfix_file_rate": 0.2,
+          "mean_future_bugfix_commits_per_file": 0.2
+        },
+        "high": {
+          "files": 4,
+          "files_with_future_bugfix": 0,
+          "future_bugfix_file_rate": 0.0,
+          "mean_future_bugfix_commits_per_file": 0.0
+        },
+        "high_risk_precision": 0.0
+      },
+      "outcomes": {
+        "eligible_nonmerge_commits": 37,
+        "excluded_pre_cutoff_nonmerge_commits": 6,
+        "bugfix_like_commits": 4,
+        "labeled_commits": [
+          {
+            "sha": "cc23d1c6445d61c1e6905cae4861d6e3c3244274",
+            "subject": "Fix compatibility with pytest 8",
+            "scored_paths": [
+              "requirements-dev.txt",
+              "tests/test_requests.py"
+            ]
+          },
+          {
+            "sha": "1604e20fc87ce212cf3a02474a6d7509b640cbbb",
+            "subject": "Fix the proxy_bypass_registry function all returning true in some cases.",
+            "scored_paths": [
+              "src/requests/utils.py"
+            ]
+          },
+          {
+            "sha": "5fc10bf1f5185f330f8471c738ce753b3e231008",
+            "subject": "Fix httpbin pin for test suite",
+            "scored_paths": [
+              "requirements-dev.txt"
+            ]
+          },
+          {
+            "sha": "3ff3ff21dd45957c9e143cd500291959bb15f690",
+            "subject": "Fix #6628 - JSONDecodeError are not deserializable",
+            "scored_paths": [
+              "src/requests/exceptions.py",
+              "tests/test_requests.py"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "expressjs/express",
+      "url": "https://github.com/expressjs/express.git",
+      "ref": "refs/tags/4.21.2",
+      "anchor": "1faf228935aa0a13111f92c28ee795be64ce3f0f",
+      "cutoff_revision": "a22920707bfd30e083e5b8e076841d226266cb06",
+      "outcome_revision": "4cf7eed927d3ccd3f1d0c9a14d562ec0a1635e86",
+      "history_audit": {
+        "reachable_commits": 5783,
+        "max_committer_timestamp": 1698890917
+      },
+      "outcome_audit": {
+        "reachable_commits": 5843,
+        "max_committer_timestamp": 1719440599
+      },
+      "history_window_commits": 4,
+      "files_scored": 231,
+      "groups": {
+        "low": {
+          "files": 228,
+          "files_with_future_bugfix": 6,
+          "future_bugfix_file_rate": 0.02631578947368421,
+          "mean_future_bugfix_commits_per_file": 0.03070175438596491
+        },
+        "medium": {
+          "files": 3,
+          "files_with_future_bugfix": 0,
+          "future_bugfix_file_rate": 0.0,
+          "mean_future_bugfix_commits_per_file": 0.0
+        },
+        "high": {
+          "files": 0,
+          "files_with_future_bugfix": 0,
+          "future_bugfix_file_rate": null,
+          "mean_future_bugfix_commits_per_file": null
+        },
+        "high_risk_precision": null
+      },
+      "outcomes": {
+        "eligible_nonmerge_commits": 60,
+        "excluded_pre_cutoff_nonmerge_commits": 0,
+        "bugfix_like_commits": 3,
+        "labeled_commits": [
+          {
+            "sha": "0b746953c4bd8e377123527db11f9cd866e39f94",
+            "subject": "Improved fix for open redirect allow list bypass",
+            "scored_paths": [
+              "History.md",
+              "lib/response.js",
+              "test/res.location.js"
+            ]
+          },
+          {
+            "sha": "11f2b1db227fd42c2508c427032c1ec671b306be",
+            "subject": "build: fix build due to inconsistent supertest behavior in older versions",
+            "scored_paths": [
+              "test/res.location.js"
+            ]
+          },
+          {
+            "sha": "2a89eb5c749a168820d6ea96723ad8a7e979a58b",
+            "subject": "tests: fix handling multiple callbacks",
+            "scored_paths": [
+              "test/Router.js",
+              "test/app.router.js",
+              "test/app.use.js"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
