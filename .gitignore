@@ -216,3 +216,21 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# Local virtual environments
+.sam-venv/
+
+# AWS SAM build artifacts
+.aws-sam/
+
+# Local deployment config — may contain parameter overrides/secrets
+samconfig.toml
+
+# Environment/secrets files
+.env
+.env.*
+!.env.example
+
+# VS Code local settings
+.vscode/
