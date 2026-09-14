@@ -270,6 +270,13 @@ def post_to_api(
     payload: dict,
 ) -> None:
 
+    api_key = os.environ.get("PR_RISK_API_KEY")
+
+    if not api_key:
+        raise RuntimeError(
+            "PR_RISK_API_KEY must be set when posting to AWS."
+        )
+
     data = json.dumps(payload).encode("utf-8")
 
     request = urllib.request.Request(
@@ -277,6 +284,7 @@ def post_to_api(
         data=data,
         headers={
             "Content-Type": "application/json",
+            "x-api-key": api_key,
         },
         method="POST",
     )
@@ -397,7 +405,7 @@ def write_github_summary(payload: dict) -> None:
     ) as summary_file:
         summary_file.write("\n".join(lines))
         summary_file.write("\n")
-        
+
 def main():
 
     base_sha = os.environ.get("PR_BASE_SHA")

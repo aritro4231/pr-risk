@@ -23,6 +23,10 @@ Globals:
 
 Resources:
 
+  # ---------------------------------------------------------
+  # VPC
+  # ---------------------------------------------------------
+
   PRRiskVPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -79,6 +83,10 @@ Resources:
       SubnetId: !Ref PrivateSubnet2
       RouteTableId: !Ref PrivateRouteTable
 
+  # ---------------------------------------------------------
+  # Security Groups
+  # ---------------------------------------------------------
+
   LambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -95,12 +103,16 @@ Resources:
       VpcId: !Ref PRRiskVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 5432  
+          FromPort: 5432
           ToPort: 5432
           SourceSecurityGroupId: !Ref LambdaSecurityGroup
       Tags:
         - Key: Name
           Value: pr-risk-rds-sg
+
+  # ---------------------------------------------------------
+  # RDS PostgreSQL
+  # ---------------------------------------------------------
 
   PRRiskDBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -139,12 +151,28 @@ Resources:
         - Key: Name
           Value: pr-risk-postgres
 
+  # ---------------------------------------------------------
+  # API Gateway
+  # ---------------------------------------------------------
+
+  ServerlessRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: pr-risk-api
+      StageName: Prod
+
+  # ---------------------------------------------------------
+  # Lambda
+  # ---------------------------------------------------------
+
   PRRiskFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: pr-risk-scorer
       CodeUri: src/
       Handler: pr_risk.aws_handler.lambda_handler
+
+      #ReservedConcurrentExecutions: 2
 
       Policies:
         - AWSLambdaVPCAccessExecutionRole
@@ -168,8 +196,50 @@ Resources:
         ScoreAPI:
           Type: Api
           Properties:
+            RestApiId: !Ref ServerlessRestApi
             Path: /score
             Method: post
+            Auth:
+              ApiKeyRequired: true
+
+  # ---------------------------------------------------------
+  # API Key + Rate Limits
+  # ---------------------------------------------------------
+
+  PRRiskApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: pr-risk-api-key
+      Enabled: true
+
+  PRRiskUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn:
+      - ServerlessRestApiProdStage
+    Properties:
+      UsagePlanName: pr-risk-usage-plan
+
+      Throttle:
+        RateLimit: 1
+        BurstLimit: 2
+
+      Quota:
+        Limit: 1000
+        Period: MONTH
+
+      ApiStages:
+        - ApiId: !Ref ServerlessRestApi
+          Stage: Prod
+
+  PRRiskUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    DependsOn:
+      - PRRiskUsagePlan
+      - PRRiskApiKey
+    Properties:
+      KeyId: !Ref PRRiskApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref PRRiskUsagePlan
 
 Outputs:
 
